@@ -1,0 +1,65 @@
+# Node.js dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Docker
+docker/
+docker-compose.yml
+Dockerfile
+.dockerignore
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Editor-specific files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Test coverage
+coverage/
+
+# Build output
+dist/
+build/
+
+# Temporary files
+tmp/
+temp/
+*.swp
+*.bak
+*.tmp
+
+# Static files and assets
+/public/
+assets/
+
+# API documentation generated files
+docs/api/
+
+# Ignore test artifacts
+junit.xml
+test-report.xml
+
+# Ignore linting cache
+.eslintcache
+
+# Ignore compiled code
+*.out
+*.o
+*.a
+
+# Ignore personal config files
+*.local
+*.secret
