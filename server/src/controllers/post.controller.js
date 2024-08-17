@@ -1,4 +1,5 @@
 const Post = require("../models/post.model");
+const Comment = require("../models/comment.model");
 const asyncErrorHandler = require("../middleware/asyncErrorHandler");
 const ErrorHandler = require("../utils/errorHandler");
 const cloudinary = require("cloudinary").v2;
@@ -46,7 +47,19 @@ const createPost = asyncErrorHandler(async (req, res, next) => {
 const getPostById = asyncErrorHandler(async (req, res, next) => {
   const { postId } = req.params;
 
-  const post = await Post.findById(postId).populate("userId", "username");
+  const post = await Post.findById(postId)
+    .populate({
+      path: 'comments',
+      populate: {
+        path: 'replies',
+        options: { sort: { createdAt: -1 }, limit: 2 }, // Show two most recent replies
+        populate: {
+          path: 'userId',
+          select: 'username', // Populate username of the user who replied
+        },
+      },
+    })
+    .populate("userId", "username");
 
   if (!post) {
     const error = new ErrorHandler("Post not found", 404);
@@ -150,7 +163,7 @@ const deletePost = asyncErrorHandler(async (req, res, next) => {
     await cloudinary.uploader.destroy(post.image.public_id);
   }
 
-  await post.remove();
+  await post.deleteOne();
 
   res.status(200).json({
     success: true,

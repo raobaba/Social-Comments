@@ -4,7 +4,6 @@ const {
   registerUser,
   loginUser,
   logoutUser,
-  uploadFile,
   updateFile, // Import the updateFile function
 } = require("../controllers/user.controller.js");
 const isAuthenticatedUser = require("../middleware/auth");
@@ -142,48 +141,6 @@ router.route("/login").post(loginUser);
  *         description: Internal Server Error
  */
 router.route("/logout").get(logoutUser);
-
-/**
- * @swagger
- * /api/v1/users/avatar:
- *   post:
- *     summary: Upload user avatar
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               avatar:
- *                 type: string
- *                 format: binary
- *     responses:
- *       200:
- *         description: File uploaded successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 message:
- *                   type: string
- *                 data:
- *                   type: object
- *                   properties:
- *                     public_id:
- *                       type: string
- *                     url:
- *                       type: string
- *       400:
- *         description: Bad Request
- *       500:
- *         description: Internal Server Error
- */
-router.route("/avatar").post(isAuthenticatedUser, uploadFile);
 
 /**
  * @swagger

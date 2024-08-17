@@ -67,7 +67,6 @@ const isAuthenticatedUser = require('../middleware/auth');
  */
 router.route('/').post(isAuthenticatedUser, createPost);
 
-
 /**
  * @swagger
  * /api/v1/posts:
@@ -80,16 +79,18 @@ router.route('/').post(isAuthenticatedUser, createPost);
  *         required: false
  *         schema:
  *           type: integer
- *         description: The page number to retrieve
+ *           example: 1
+ *         description: The page number
  *       - in: query
  *         name: pageSize
  *         required: false
  *         schema:
  *           type: integer
+ *           example: 10
  *         description: The number of posts per page
  *     responses:
  *       200:
- *         description: Posts retrieved successfully
+ *         description: A list of posts
  *         content:
  *           application/json:
  *             schema:
@@ -103,15 +104,17 @@ router.route('/').post(isAuthenticatedUser, createPost);
  *                     $ref: '#/components/schemas/Post'
  *                 totalPosts:
  *                   type: integer
+ *                   example: 50
  *                 totalPages:
  *                   type: integer
+ *                   example: 5
  *                 currentPage:
  *                   type: integer
+ *                   example: 1
  *       500:
  *         description: Internal Server Error
  */
 router.route('/').get(getAllPosts);
-
 
 /**
  * @swagger
@@ -125,10 +128,11 @@ router.route('/').get(getAllPosts);
  *         required: true
  *         schema:
  *           type: string
- *         description: The ID of the post to retrieve
+ *           example: "60c72b9f4f1a4b001c8e4d12"
+ *         description: The ID of the post
  *     responses:
  *       200:
- *         description: Post retrieved successfully
+ *         description: A post object
  *         content:
  *           application/json:
  *             schema:
@@ -149,7 +153,7 @@ router.route('/:postId').get(getPostById);
  * @swagger
  * /api/v1/posts/{postId}:
  *   put:
- *     summary: Update a post by ID
+ *     summary: Update a post
  *     tags: [Posts]
  *     security:
  *       - bearerAuth: []
@@ -159,11 +163,12 @@ router.route('/:postId').get(getPostById);
  *         required: true
  *         schema:
  *           type: string
- *         description: The ID of the post to update
+ *           example: "60c72b9f4f1a4b001c8e4d12"
+ *         description: The ID of the post
  *     requestBody:
- *       required: true
+ *       required: false
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
  *             type: object
  *             properties:
@@ -172,10 +177,7 @@ router.route('/:postId').get(getPostById);
  *                 example: "Updated Post Title"
  *               content:
  *                 type: string
- *                 example: "Updated post content."
- *               image:
- *                 type: string
- *                 format: binary
+ *                 example: "Updated content of the post."
  *     responses:
  *       200:
  *         description: Post updated successfully
@@ -191,10 +193,12 @@ router.route('/:postId').get(getPostById);
  *                   example: "Post updated successfully"
  *                 data:
  *                   $ref: '#/components/schemas/Post'
- *       403:
- *         description: Unauthorized
  *       404:
  *         description: Post not found
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
  *       500:
  *         description: Internal Server Error
  */
@@ -204,7 +208,7 @@ router.route('/:postId').put(isAuthenticatedUser, updatePost);
  * @swagger
  * /api/v1/posts/{postId}:
  *   delete:
- *     summary: Delete a post by ID
+ *     summary: Delete a post
  *     tags: [Posts]
  *     security:
  *       - bearerAuth: []
@@ -214,7 +218,8 @@ router.route('/:postId').put(isAuthenticatedUser, updatePost);
  *         required: true
  *         schema:
  *           type: string
- *         description: The ID of the post to delete
+ *           example: "60c72b9f4f1a4b001c8e4d12"
+ *         description: The ID of the post
  *     responses:
  *       200:
  *         description: Post deleted successfully
@@ -228,10 +233,12 @@ router.route('/:postId').put(isAuthenticatedUser, updatePost);
  *                 message:
  *                   type: string
  *                   example: "Post deleted successfully"
- *       403:
- *         description: Unauthorized
  *       404:
  *         description: Post not found
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
  *       500:
  *         description: Internal Server Error
  */

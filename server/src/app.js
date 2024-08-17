@@ -1,5 +1,6 @@
 const express = require("express");
 require("dotenv").config();
+require('events').EventEmitter.defaultMaxListeners = 20;
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
@@ -23,7 +24,7 @@ app.use(cors());
 
 Connection();
 app.use("/api/v1", allRouter);
-
+console.log(app.listenerCount('connection'));
 app.get("/", (req, res) => {
   res.send("Server is Running! 🚀");
 });

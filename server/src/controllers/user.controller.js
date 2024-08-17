@@ -4,31 +4,6 @@ const sendToken = require("./../utils/sendToken");
 const ErrorHandler = require("../utils/errorHandler");
 const cloudinary = require("cloudinary");
 
-const uploadFile = asyncErrorHandler(async (req, res, next) => {
-  if (!req.files.avatar.tempFilePath) {
-    const error = new ErrorHandler("No file uploaded", 400);
-    return error.sendError(res);
-  }
-
-  const result = await cloudinary.uploader.upload(
-    req.files.avatar.tempFilePath,
-    {
-      folder: "avatars",
-      width: 150,
-      crop: "scale",
-    }
-  );
-
-  res.status(200).json({
-    success: true,
-    message: "File uploaded successfully",
-    data: {
-      public_id: result.public_id,
-      url: result.secure_url,
-    },
-  });
-});
-
 // Register User
 const registerUser = asyncErrorHandler(async (req, res, next) => {
   const { firstName, lastName, username, email, password } = req.body;
@@ -133,6 +108,5 @@ module.exports = {
   registerUser,
   loginUser,
   logoutUser,
-  uploadFile,
   updateFile,
 };
