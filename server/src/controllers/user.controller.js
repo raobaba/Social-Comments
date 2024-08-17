@@ -5,15 +5,19 @@ const ErrorHandler = require("../utils/errorHandler");
 const cloudinary = require("cloudinary");
 
 const uploadFile = asyncErrorHandler(async (req, res, next) => {
-  if (!req.file) {
+  if (!req.files.avatar.tempFilePath) {
     const error = new ErrorHandler("No file uploaded", 400);
     return error.sendError(res);
   }
 
-  const result = await cloudinary.uploader.upload(req.file.path, {
-    folder: "uploads",
-    resource_type: "auto",
-  });
+  const result = await cloudinary.uploader.upload(
+    req.files.avatar.tempFilePath,
+    {
+      folder: "avatars",
+      width: 150,
+      crop: "scale",
+    }
+  );
 
   res.status(200).json({
     success: true,
@@ -28,7 +32,6 @@ const uploadFile = asyncErrorHandler(async (req, res, next) => {
 // Register User
 const registerUser = asyncErrorHandler(async (req, res, next) => {
   const { firstName, lastName, username, email, password } = req.body;
-  console.log(req.body);
   // Ensure required fields are provided
   if (!firstName || !lastName || !username || !email || !password) {
     const error = new ErrorHandler("All fields are required", 400);
@@ -101,9 +104,35 @@ const logoutUser = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
+const updateFile = asyncErrorHandler(async (req, res, next) => {
+  if (!req.files || !req.files.avatar || !req.files.avatar.tempFilePath) {
+    const error = new ErrorHandler("No file uploaded", 400);
+    return error.sendError(res);
+  }
+
+  const result = await cloudinary.uploader.upload(
+    req.files.avatar.tempFilePath,
+    {
+      folder: "avatars",
+      width: 150,
+      crop: "scale",
+    }
+  );
+
+  res.status(200).json({
+    success: true,
+    message: "File updated successfully",
+    data: {
+      public_id: result.public_id,
+      url: result.secure_url,
+    },
+  });
+});
+
 module.exports = {
   registerUser,
   loginUser,
   logoutUser,
   uploadFile,
+  updateFile,
 };

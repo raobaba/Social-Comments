@@ -5,11 +5,15 @@ const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
 const Connection = require("./config/database");
 const allRouter = require("./routes/index");
-
+const { swaggerUi, openapiSpecification } = require("./../docs/swagger");
 const app = express();
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openapiSpecification));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
 app.use(
   fileUpload({
     useTempFiles: true,
