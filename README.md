@@ -7,17 +7,17 @@ Multi-Level Comment System
 ## Introduction
 
 ### Book Management API
--Create Posts: Allows users to create posts with titles, content, and optional images.
--Retrieve Posts: Fetches posts with associated comments, including pagination and sorting options.
--Update Posts: Enables users to update their own posts, including changing content and images.
--Delete Posts: Allows users to delete their own posts, including associated images.
--Create Comments: Lets users add comments to posts, with optional images.
--Reply to Comments: Supports creating replies to existing comments, with optional images.
--Retrieve Comments: Fetches comments for a post, including pagination and sorting options, with recent replies included.
--Edit Comments: Enables users to update their own comments, including text and images.
--Delete Comments: Allows users to delete their own comments, including replies.
--Edit Replies: Lets users update their own replies to comments.
--Delete Replies: Supports deleting replies to comments.
+- Allows users to create posts with titles, content, and optional images.
+- Fetches posts with associated comments, including pagination and sorting options.
+- Enables users to update their own posts, including changing content and images.
+- Allows users to delete their own posts, including associated images.
+- Lets users add comments to posts, with optional images.
+- Supports creating replies to existing comments, with optional images.
+- Fetches comments for a post, including pagination and sorting options, with recent replies included.
+- Enables users to update their own comments, including text and images.
+- Allows users to delete their own comments, including replies.
+- Lets users update their own replies to comments.
+- Supports deleting replies to comments.
 
 ## Project Type
  Backend 
