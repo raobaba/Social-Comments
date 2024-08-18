@@ -6,7 +6,7 @@ Multi-Level Comment System
 
 ## Introduction
 
-### Book Management API
+### Multi-Level Comment System API
 - Allows users to create posts with titles, content, and optional images.
 - Fetches posts with associated comments, including pagination and sorting options.
 - Enables users to update their own posts, including changing content and images.
