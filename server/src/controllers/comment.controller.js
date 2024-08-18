@@ -1,4 +1,5 @@
 const Comment = require("../models/comment.model");
+const Post = require("../models/post.model");
 const asyncErrorHandler = require("../middleware/asyncErrorHandler");
 const ErrorHandler = require("../utils/errorHandler");
 
@@ -20,6 +21,11 @@ const createComment = asyncErrorHandler(async (req, res, next) => {
     userId: req.user._id,
     text,
     image,
+  });
+
+  // Add the comment to the associated post's comments array
+  await Post.findByIdAndUpdate(postId, {
+    $push: { comments: comment._id },
   });
 
   res.status(201).json({
@@ -89,7 +95,7 @@ const getCommentsForPost = asyncErrorHandler(async (req, res, next) => {
       },
     });
 
-    console.log(comments)
+  console.log(comments);
 
   res.status(200).json({
     success: true,
@@ -122,7 +128,7 @@ const expandParentComments = asyncErrorHandler(async (req, res, next) => {
       },
     });
 
-    console.log(comments)
+  console.log(comments);
 
   res.status(200).json({
     success: true,

@@ -46,7 +46,8 @@ const createPost = asyncErrorHandler(async (req, res, next) => {
 // Get all posts with comments and comment count
 const getAllPosts = asyncErrorHandler(async (req, res, next) => {
   const { page = 1, pageSize = 10 } = req.query;
-
+   const postdata = await Post.find();
+   console.log(postdata)
   const posts = await Post.find()
     .skip((page - 1) * pageSize)
     .limit(parseInt(pageSize))
