@@ -43,19 +43,58 @@ const createPost = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
-// Get a single post by ID
+// Get all posts with comments and comment count
+const getAllPosts = asyncErrorHandler(async (req, res, next) => {
+  const { page = 1, pageSize = 10 } = req.query;
+
+  const posts = await Post.find()
+    .skip((page - 1) * pageSize)
+    .limit(parseInt(pageSize))
+    .populate({
+      path: "comments",
+      populate: {
+        path: "userId",
+        select: "username",
+      },
+    })
+    .populate("userId", "username");
+
+  const totalPosts = await Post.countDocuments();
+
+  const updatedPosts = await Promise.all(
+    posts.map(async (post) => {
+      const comments = await Comment.find({ _id: { $in: post.comments } })
+        .populate("userId", "username");
+
+      return {
+        ...post.toObject(),
+        comments: comments,
+        commentCount: comments.length,
+      };
+    })
+  );
+
+  res.status(200).json({
+    success: true,
+    data: updatedPosts,
+    totalPosts,
+    totalPages: Math.ceil(totalPosts / pageSize),
+    currentPage: parseInt(page),
+  });
+});
+
+// Get a single post by ID with all comments and comment count
 const getPostById = asyncErrorHandler(async (req, res, next) => {
   const { postId } = req.params;
 
   const post = await Post.findById(postId)
     .populate({
-      path: 'comments',
+      path: "comments",
       populate: {
-        path: 'replies',
-        options: { sort: { createdAt: -1 }, limit: 2 }, // Show two most recent replies
+        path: "replies",
         populate: {
-          path: 'userId',
-          select: 'username', // Populate username of the user who replied
+          path: "userId",
+          select: "username",
         },
       },
     })
@@ -66,29 +105,16 @@ const getPostById = asyncErrorHandler(async (req, res, next) => {
     return error.sendError(res);
   }
 
-  res.status(200).json({
-    success: true,
-    data: post,
-  });
-});
-
-// Get all posts with pagination
-const getAllPosts = asyncErrorHandler(async (req, res, next) => {
-  const { page = 1, pageSize = 10 } = req.query;
-
-  const posts = await Post.find()
-    .skip((page - 1) * pageSize)
-    .limit(parseInt(pageSize))
+  const comments = await Comment.find({ _id: { $in: post.comments } })
     .populate("userId", "username");
 
-  const totalPosts = await Post.countDocuments();
-
   res.status(200).json({
     success: true,
-    data: posts,
-    totalPosts,
-    totalPages: Math.ceil(totalPosts / pageSize),
-    currentPage: parseInt(page),
+    data: {
+      ...post.toObject(),
+      comments: comments,
+      commentCount: comments.length,
+    },
   });
 });
 
@@ -173,8 +199,8 @@ const deletePost = asyncErrorHandler(async (req, res, next) => {
 
 module.exports = {
   createPost,
-  getPostById,
   getAllPosts,
+  getPostById,
   updatePost,
   deletePost,
 };

@@ -8,7 +8,10 @@ const createComment = asyncErrorHandler(async (req, res, next) => {
   const { postId } = req.params;
 
   if (!postId || !text) {
-    const error = new ErrorHandler("Post ID and comment text are required", 400);
+    const error = new ErrorHandler(
+      "Post ID and comment text are required",
+      400
+    );
     return error.sendError(res);
   }
 
@@ -16,7 +19,7 @@ const createComment = asyncErrorHandler(async (req, res, next) => {
     postId,
     userId: req.user._id,
     text,
-    image, // Include image field if provided
+    image,
   });
 
   res.status(201).json({
@@ -32,7 +35,10 @@ const replyToComment = asyncErrorHandler(async (req, res, next) => {
   const { postId, commentId } = req.params;
 
   if (!postId || !commentId || !text) {
-    const error = new ErrorHandler("Post ID, comment ID, and reply text are required", 400);
+    const error = new ErrorHandler(
+      "Post ID, comment ID, and reply text are required",
+      400
+    );
     return error.sendError(res);
   }
 
@@ -42,7 +48,7 @@ const replyToComment = asyncErrorHandler(async (req, res, next) => {
     userId: req.user._id,
     text,
     parentCommentId: commentId,
-    image, // Include image field if provided
+    image,
   });
 
   // Update the parent comment to include the new reply
@@ -73,15 +79,17 @@ const getCommentsForPost = asyncErrorHandler(async (req, res, next) => {
     .sort({ [sortBy]: sortOrder === "asc" ? 1 : -1 })
     .populate({
       path: "replies",
-      options: { 
-        sort: { createdAt: -1 }, // Sort replies by creation date in descending order
-        limit: 2, // Limit to two recent replies
+      options: {
+        sort: { createdAt: -1 },
+        limit: 2,
       },
       populate: {
         path: "userId",
         select: "username",
       },
     });
+
+    console.log(comments)
 
   res.status(200).json({
     success: true,
@@ -104,15 +112,17 @@ const expandParentComments = asyncErrorHandler(async (req, res, next) => {
     .limit(parseInt(pageSize))
     .populate({
       path: "replies",
-      options: { 
-        sort: { createdAt: -1 }, 
-        limit: 2, 
+      options: {
+        sort: { createdAt: -1 },
+        limit: 2,
       },
       populate: {
         path: "userId",
         select: "username",
       },
     });
+
+    console.log(comments)
 
   res.status(200).json({
     success: true,
@@ -125,22 +135,22 @@ const editComment = asyncErrorHandler(async (req, res, next) => {
   const { postId, commentId } = req.params;
   const { text, image } = req.body;
 
-  // Find the comment belonging to the specific post
   const comment = await Comment.findOne({ _id: commentId, postId });
   if (!comment) {
-    const error = new ErrorHandler("Comment not found or does not belong to the specified post", 404);
+    const error = new ErrorHandler(
+      "Comment not found or does not belong to the specified post",
+      404
+    );
     return error.sendError(res);
   }
 
-  // Check if the user is the author of the comment
   if (comment.userId.toString() !== req.user._id.toString()) {
     const error = new ErrorHandler("You can only edit your own comments", 403);
     return error.sendError(res);
   }
 
-  // Update the comment
   comment.text = text || comment.text;
-  comment.image = image || comment.image; // Update image if provided
+  comment.image = image || comment.image;
   await comment.save();
 
   res.status(200).json({
@@ -154,28 +164,29 @@ const editComment = asyncErrorHandler(async (req, res, next) => {
 const deleteComment = asyncErrorHandler(async (req, res, next) => {
   const { postId, commentId } = req.params;
 
-  // Find the comment belonging to the specific post
   const comment = await Comment.findOne({ _id: commentId, postId });
   if (!comment) {
-    const error = new ErrorHandler("Comment not found or does not belong to the specified post", 404);
-    return error.sendError(res);
-  }
-
-  // Check if the user is the author of the comment
-  if (comment.userId.toString() !== req.user._id.toString()) {
-    const error = new ErrorHandler("You can only delete your own comments", 403);
-    return error.sendError(res);
-  }
-
-  // Remove the comment from its parent comments' replies
-  if (comment.parentCommentId) {
-    await Comment.findByIdAndUpdate(
-      comment.parentCommentId,
-      { $pull: { replies: commentId } }
+    const error = new ErrorHandler(
+      "Comment not found or does not belong to the specified post",
+      404
     );
+    return error.sendError(res);
   }
 
-  // Delete the comment
+  if (comment.userId.toString() !== req.user._id.toString()) {
+    const error = new ErrorHandler(
+      "You can only delete your own comments",
+      403
+    );
+    return error.sendError(res);
+  }
+
+  if (comment.parentCommentId) {
+    await Comment.findByIdAndUpdate(comment.parentCommentId, {
+      $pull: { replies: commentId },
+    });
+  }
+
   await comment.deleteOne();
 
   res.status(200).json({
@@ -189,29 +200,31 @@ const editReply = asyncErrorHandler(async (req, res, next) => {
   const { postId, commentId, replyId } = req.params;
   const { text, image } = req.body;
 
-  // Find the comment belonging to the specific post
   const comment = await Comment.findOne({ _id: commentId, postId });
   if (!comment) {
-    const error = new ErrorHandler("Comment not found or does not belong to the specified post", 404);
+    const error = new ErrorHandler(
+      "Comment not found or does not belong to the specified post",
+      404
+    );
     return error.sendError(res);
   }
 
-  // Find the reply within the comment
-  const reply = await Comment.findOne({ _id: replyId, parentCommentId: commentId });
+  const reply = await Comment.findOne({
+    _id: replyId,
+    parentCommentId: commentId,
+  });
   if (!reply) {
     const error = new ErrorHandler("Reply not found", 404);
     return error.sendError(res);
   }
 
-  // Check if the user is the author of the reply
   if (reply.userId.toString() !== req.user._id.toString()) {
     const error = new ErrorHandler("You can only edit your own replies", 403);
     return error.sendError(res);
   }
 
-  // Update the reply
   reply.text = text || reply.text;
-  reply.image = image || reply.image; // Update image if provided
+  reply.image = image || reply.image;
   await reply.save();
 
   res.status(200).json({
@@ -225,31 +238,32 @@ const editReply = asyncErrorHandler(async (req, res, next) => {
 const deleteReply = asyncErrorHandler(async (req, res, next) => {
   const { postId, commentId, replyId } = req.params;
 
-  // Find the comment belonging to the specific post
   const comment = await Comment.findOne({ _id: commentId, postId });
   if (!comment) {
-    const error = new ErrorHandler("Comment not found or does not belong to the specified post", 404);
+    const error = new ErrorHandler(
+      "Comment not found or does not belong to the specified post",
+      404
+    );
     return error.sendError(res);
   }
 
-  // Find the reply within the comment
-  const reply = await Comment.findOne({ _id: replyId, parentCommentId: commentId });
+  const reply = await Comment.findOne({
+    _id: replyId,
+    parentCommentId: commentId,
+  });
   if (!reply) {
     const error = new ErrorHandler("Reply not found", 404);
     return error.sendError(res);
   }
 
-  // Check if the user is the author of the reply
   if (reply.userId.toString() !== req.user._id.toString()) {
     const error = new ErrorHandler("You can only delete your own replies", 403);
     return error.sendError(res);
   }
 
-  // Remove the reply from the parent comment's replies
   comment.replies.pull(replyId);
   await comment.save();
 
-  // Delete the reply
   await reply.deleteOne();
 
   res.status(200).json({

@@ -28,6 +28,10 @@ const postSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Comment',
   }],
+  commentCount: {
+    type: Number,
+    default: 0,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -41,6 +45,15 @@ const postSchema = new mongoose.Schema({
 // Middleware to update `updatedAt` before saving
 postSchema.pre('save', function(next) {
   this.updatedAt = Date.now();
+  next();
+});
+
+// Update commentCount before saving
+postSchema.pre('save', async function(next) {
+  if (this.isModified('comments')) {
+    // Update commentCount
+    this.commentCount = this.comments.length;
+  }
   next();
 });
 

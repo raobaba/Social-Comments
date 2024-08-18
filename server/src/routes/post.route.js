@@ -71,7 +71,7 @@ router.route('/').post(isAuthenticatedUser, createPost);
  * @swagger
  * /api/v1/posts:
  *   get:
- *     summary: Get all posts with pagination
+ *     summary: Get all posts with pagination and comment count
  *     tags: [Posts]
  *     parameters:
  *       - in: query
@@ -101,7 +101,7 @@ router.route('/').post(isAuthenticatedUser, createPost);
  *                 data:
  *                   type: array
  *                   items:
- *                     $ref: '#/components/schemas/Post'
+ *                     $ref: '#/components/schemas/PostWithCommentCount'
  *                 totalPosts:
  *                   type: integer
  *                   example: 50
@@ -120,7 +120,7 @@ router.route('/').get(getAllPosts);
  * @swagger
  * /api/v1/posts/{postId}:
  *   get:
- *     summary: Get a post by ID
+ *     summary: Get a post by ID with comment count
  *     tags: [Posts]
  *     parameters:
  *       - in: path
@@ -132,7 +132,7 @@ router.route('/').get(getAllPosts);
  *         description: The ID of the post
  *     responses:
  *       200:
- *         description: A post object
+ *         description: A post object with comment count and recent comments
  *         content:
  *           application/json:
  *             schema:
@@ -141,7 +141,7 @@ router.route('/').get(getAllPosts);
  *                 success:
  *                   type: boolean
  *                 data:
- *                   $ref: '#/components/schemas/Post'
+ *                   $ref: '#/components/schemas/PostWithCommentCount'
  *       404:
  *         description: Post not found
  *       500:
