@@ -24,7 +24,7 @@ Multi-Level Comment System
 
 ## Deplolyed App
 ```bash
-Backend: https://ecommerceplus-server.onrender.com/
+Backend: https://nested-comment-system.onrender.com/
 Database: mongodb+srv://YOUR_USERNAME:YUOR_PASSWORD@cluster0.vvtoxbl.mongodb.net/social?retryWrites=true&w=majority
 ```
 ## Directory Structure
